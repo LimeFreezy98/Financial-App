@@ -1,0 +1,14 @@
+/* style.css */
+
+body {
+    font-family: Arial, sans-serif4;
+}
+
+.container {
+    max-width: 500px;
+  }
+  
+  button {
+    font-weight: bold;
+  }
+  
