@@ -1,0 +1,18 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+
+ .container {
+    max-width: 800px;
+ }
+
+ .table td, .table th {
+    vertical-align: middle;
+ }
+
+
+
+  button {
+    font-weight: bold;
+  }

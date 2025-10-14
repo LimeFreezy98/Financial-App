@@ -37,6 +37,10 @@ function getTransactions() {
     window.location.href = "addTransaction.html"; // next page (Page 2)
   });
 
+  document.getElementById("viewHistoryBtn").addEventListener("click", () => {
+    window.location.href = "transactionHistory.html"; // next page (Page 3)
+  });
+
 
 
 
