@@ -1,5 +1,9 @@
 //  transactionHistory.js
 
+const savedTheme = localStorage.getItem("theme") || "light";
+document.body.setAttribute("data-theme", savedTheme);
+
+
 import { getTransactions, calculateTotals,  } from "./helper.js";
 
 
