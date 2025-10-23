@@ -19,6 +19,7 @@ document.getElementById("transactionForm").addEventListener("submit", (e) => {
     const amount = parseFloat(document.getElementById("amount").value);
     const date = document.getElementById("date").value;
     const notes = document.getElementById("notes").value.trim();
+    const recurring = document.getElementById("recurring").value;
   
     if (!type || !category || isNaN(amount) || amount <= 0 || !date) {
       alert("Please fill in all required fields correctly.");
@@ -30,7 +31,9 @@ document.getElementById("transactionForm").addEventListener("submit", (e) => {
         category,
         amount,
         date,
-        notes
+        notes,
+        recurring, // save recurring
+        lastGenerated: date // used to track future repeats 
     };
 
 

@@ -6,7 +6,51 @@ document.body.setAttribute("data-theme", savedTheme);
 
 import { getTransactions, calculateTotals,  } from "./helper.js";
 
+handleRecurringTransactions();
 
+function handleRecurringTransactions() {
+    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+    let today = new Date().toISOString().split("T")[0];
+    let updated = false;
+  
+    transactions.forEach(tx => {
+      if (!tx.recurring || tx.recurring === "none") return;
+  
+      let lastDate = new Date(tx.lastGenerated);
+      let nextDate = new Date(lastDate);
+  
+      switch (tx.recurring) {
+        case "daily":
+          nextDate.setDate(lastDate.getDate() + 1);
+          break;
+        case "weekly":
+          nextDate.setDate(lastDate.getDate() + 7);
+          break;
+        case "monthly":
+          nextDate.setMonth(lastDate.getMonth() + 1);
+          break;
+        case "yearly":
+          nextDate.setFullYear(lastDate.getFullYear() + 1);
+          break;
+      }
+  
+      const nextDateStr = nextDate.toISOString().split("T")[0];
+      if (today >= nextDateStr && tx.lastGenerated < nextDateStr) {
+        const newTx = {
+          ...tx,
+          date: nextDateStr,
+          lastGenerated: nextDateStr,
+        };
+        transactions.push(newTx);
+        tx.lastGenerated = nextDateStr; // update original
+        updated = true;
+      }
+    });
+  
+    if (updated) {
+      localStorage.setItem("transactions", JSON.stringify(transactions));
+    }
+  }
 
 function saveTransactions(transactions) {
     localStorage.setItem("transactions", JSON.stringify(transactions));
@@ -29,9 +73,14 @@ function saveTransactions(transactions) {
           ${tx.type === 'Income' ? '+' : '-'}$${tx.amount.toFixed(2)}
         </td>
         <td>${tx.notes || ""}</td>
+        <td>${tx.recurring && tx.recurring !== "none" ? tx.recurring : "None"}</td>
         <td>
           <button class="btn btn-sm btn-primary editBtn" data-index="${index}">Edit</button>
           <button class="btn btn-sm btn-danger deleteBtn" data-index="${index}">Delete</button>
+          ${ tx.recurring && tx.recurring !== "none"
+        ? `<button class="btn btn-secondary btn-sm" onclick="disableRecurring(${index})">Stop</button>`
+         : ""
+         }
         </td>
       `;
       tbody.appendChild(row);
@@ -61,6 +110,23 @@ function saveTransactions(transactions) {
       renderTransactions();
     }
   }
+
+  function disableRecurring(index) {
+    const transactions = getTransactions();
+    if (transactions[index]) {
+      const confirmStop = confirm(
+        `Stop recurring "${transactions[index].notes || transactions[index].category}"?`
+      );
+      if (confirmStop) {
+        delete transactions[index].recurring;
+        delete transactions[index].lastGenerated;
+        saveTransactions(transactions);
+        renderTransactions();
+        alert("Recurring transaction disabled.");
+      }
+    }
+  }
+  window.disableRecurring = disableRecurring;
   
   function capitalize(str) {
     if (!str) return "";
@@ -103,6 +169,14 @@ function saveTransactions(transactions) {
         alert("Invalid date format. Edit cancelled.");
         return;
     }
+ 
+    // prompt for recurring
+     let newRecurring = prompt("Enter recurring (none/daily/weekly/monthly/yearly):", tx.recurring || "none").toLowerCase();
+     if (!["none", "daily", "weekly", "monthly", "yearly"].includes(newRecurring)) {
+        alert("Invalid recurring option. Edit cancelled");
+        return;
+     }
+
     // Prompt for notes
     let newNotes = prompt("Enter new notes:", tx.notes || "");
 
@@ -112,7 +186,9 @@ function saveTransactions(transactions) {
         category: newCategory,
         amount: newAmount,
         date: newDate,
-        notes: newNotes
+        notes: newNotes,
+        recurring: newRecurring,
+        lastGenerated: newDate
     };
 
     saveTransactions(transactions);

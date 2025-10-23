@@ -9,6 +9,34 @@ function getTransactions() {
     return data;
   }
   
+  function handleRecurringTransactions() {
+    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+    let today = new Date();
+
+    transactions.forEach(tx => {
+        if(!tx.recurring || tx.recurring === "none") return;
+
+        let lastDate = new Date(tx.lastGenerated);
+        let nextDate = new Date(lastDate);
+
+        switch (tx.recurring) {
+            case "daily": nextDate.setDate(lastDate.getDate() + 1); break;
+            case "weekly": nextDate.setDate(lastDate.getDate() + 7); break;
+            case "monthly": nextDate.setMonth(lastDate.getMonth() + 1); break;
+            case "yearly":  nextDate.setFullYear(lastDate.getFullYear() + 1); break;
+        }
+
+        if (today >= nextDate) {
+            const newTx = { ...tx, date: nextDate.toISOString().split("T")[0], lastGenerated: nextDate.toISOString().split("T")[0] };
+            transactions.push(newTx);
+            tx.lastGenerated = nextDate.toISOString().split("T")[0];
+
+        }
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+    });
+
+  }
+
   // Calculate totals
   function calculateTotals() {
     const transactions = getTransactions();
@@ -74,3 +102,4 @@ function updateThemeButton(theme) {
 
 // Run on load
 calculateTotals();
+handleRecurringTransactions();
