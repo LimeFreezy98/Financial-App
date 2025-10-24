@@ -56,10 +56,28 @@ function saveTransactions(transactions) {
     localStorage.setItem("transactions", JSON.stringify(transactions));
   }
   
+  document.getElementById("sortOrder")?.addEventListener("change", e => {
+    localStorage.setItem("sortOrder", e.target.value);
+    renderTransactions();
+  });
+
   function renderTransactions() {
     const transactions = getTransactions();
     const { totalIncome, totalExpenses } = calculateTotals(transactions);
   
+    const savedSortOrder = localStorage.getItem("sortOrder") || "newest";
+  const sortSelect = document.getElementById("sortOrder");
+  if (sortSelect) sortSelect.value = savedSortOrder;
+
+
+    // sort transation by date
+     transactions.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return savedSortOrder === "oldest" ? dateA - dateB : dateB - dateA;
+     });
+
+
     const tbody = document.getElementById("transactionTableBody");
     tbody.innerHTML = "";
   
