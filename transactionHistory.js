@@ -70,7 +70,7 @@ function saveTransactions(transactions) {
         <td>${tx.type}</td>
         <td>${tx.category}</td>
         <td class="${tx.type === 'Income' ? 'text-success' : 'text-danger'}">
-          ${tx.type === 'Income' ? '+' : '-'}$${tx.amount.toFixed(2)}
+           ${tx.type === 'Income' ? '+' : '−'}&nbsp;$${tx.amount.toFixed(2)}
         </td>
         <td>${tx.notes || ""}</td>
         <td>${tx.recurring && tx.recurring !== "none" ? tx.recurring : "None"}</td>

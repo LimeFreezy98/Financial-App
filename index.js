@@ -59,7 +59,11 @@ function getTransactions() {
      document.getElementById("totalIncome").textContent = `$${totalIncome.toFixed(2)}`;
      document.getElementById("totalExpenses").textContent = `$${totalExpenses.toFixed(2)}`;
      document.getElementById("remainingBalance").textContent = `$${remainingBalance.toFixed(2)}`;
-  }
+
+     if (remainingBalance < 0) {
+        alert("Warning: Your expenses have exceeded your total balance!");
+      }
+    }
 
   document.getElementById("addTransactionBtn").addEventListener("click", () => {
     window.location.href = "addTransaction.html"; // next page (Page 2)
